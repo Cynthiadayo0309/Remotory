@@ -1,0 +1,10 @@
+# Select Next.js development environment when previewing locally on Workers.
+NEXTJS_ENV=development
+
+# Keep these blank in Git. Set real values only in an ignored .dev.vars file.
+CLOUDFLARE_ACCESS_TEAM_DOMAIN=
+CLOUDFLARE_ACCESS_AUD=
+REMOTORY_ADMIN_EMAIL=
+
+# Local Worker preview only. Production NODE_ENV can never use this bypass.
+REMOTORY_AUTH_DEV_BYPASS=false

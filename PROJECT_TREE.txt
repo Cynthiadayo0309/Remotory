@@ -13,7 +13,8 @@ remotory_project/
 │  ├─ 05_non_functional_requirements.md
 │  ├─ 06_mvp_scope.md
 │  ├─ 07_implementation_order.md
-│  └─ 08_local_d1_development.md
+│  ├─ 08_local_d1_development.md
+│  └─ 09_cloudflare_access.md
 ├─ db/
 │  ├─ 0001_initial_schema.sql
 │  ├─ migrations/
@@ -35,6 +36,8 @@ remotory_project/
 │  │  └─ server/
 │  ├─ server/db/
 │  │  └─ repositories/
+│  ├─ server/auth/
+│  ├─ middleware.ts
 │  ├─ types/
 │  └─ validation/
 └─ tests/

@@ -43,6 +43,7 @@ Remotory は、日本に拠点があり、フルリモートで働けるポジ�
 - `docs/06_mvp_scope.md` — MVP範囲
 - `docs/07_implementation_order.md` — 実装順序
 - `docs/08_local_d1_development.md` — ローカルD1の利用方法
+- `docs/09_cloudflare_access.md` — 管理画面のCloudflare Access設定
 - `db/0001_initial_schema.sql` — D1初期スキーマ
 - `AGENTS.md` — Codex向け常設指示
 - `prompts/01_initial_codex_prompt.md` — Codexへの初回指示
