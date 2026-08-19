@@ -8,6 +8,7 @@ import {
   type UpdateCompanyInput,
 } from "@/validation/company";
 import type { Company } from "@/types/company";
+import { buildCompanyWhere } from "@/server/db/company-query";
 import { mapCompany } from "@/server/db/mappers";
 import {
   mergeRepositoryDependencies,
@@ -95,47 +96,31 @@ export class CompanyRepository {
     return row ? mapCompany(row) : null;
   }
 
+  async findPublishedBySlug(slug: string): Promise<Company | null> {
+    const validSlug = createCompanySchema.shape.slug.parse(slug);
+    const row = await this.db
+      .prepare(
+        `SELECT ${COMPANY_COLUMNS}
+         FROM companies
+         WHERE slug = ?1 AND publication_status = 'published'`,
+      )
+      .bind(validSlug)
+      .first<CompanyRow>();
+    return row ? mapCompany(row) : null;
+  }
+
   async list(filters: CompanyListFilters = {}): Promise<Company[]> {
     const value = companyListFiltersSchema.parse(filters);
-    const conditions: string[] = [];
-    const parameters: D1BindingValue[] = [];
-
-    const addCondition = (sql: string, parameter: D1BindingValue) => {
-      parameters.push(parameter);
-      conditions.push(sql.replace("?", `?${parameters.length}`));
-    };
-
-    if (value.keyword) {
-      const keyword = `%${value.keyword}%`;
-      parameters.push(keyword, keyword, keyword);
-      const start = parameters.length - 2;
-      conditions.push(
-        `(name LIKE ?${start} OR description LIKE ?${start + 1} OR industry LIKE ?${start + 2})`,
-      );
-    }
-    if (value.publicationStatus) {
-      addCondition("publication_status = ?", value.publicationStatus);
-    }
-    if (value.recruitingStatus) {
-      addCondition("recruiting_status = ?", value.recruitingStatus);
-    }
-    if (value.workLocationScope) {
-      addCondition("work_location_scope = ?", value.workLocationScope);
-    }
-    if (value.industry) {
-      addCondition("industry = ?", value.industry);
-    }
-
+    const query = buildCompanyWhere(value);
+    const parameters = [...query.parameters];
     parameters.push(value.limit, value.offset);
     const limitIndex = parameters.length - 1;
     const offsetIndex = parameters.length;
-    const where =
-      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     const result = await this.db
       .prepare(
         `SELECT ${COMPANY_COLUMNS}
          FROM companies
-         ${where}
+         ${query.where}
          ORDER BY name ASC, id ASC
          LIMIT ?${limitIndex} OFFSET ?${offsetIndex}`,
       )
@@ -143,6 +128,35 @@ export class CompanyRepository {
       .all<CompanyRow>();
 
     return result.results.map(mapCompany);
+  }
+
+  async count(filters: CompanyListFilters = {}): Promise<number> {
+    const value = companyListFiltersSchema.parse(filters);
+    const query = buildCompanyWhere(value);
+    const row = await this.db
+      .prepare(`SELECT COUNT(*) AS count FROM companies ${query.where}`)
+      .bind(...query.parameters)
+      .first<{ count: number }>();
+
+    return row?.count ?? 0;
+  }
+
+  async listIndustries(
+    publicationStatus: Company["publicationStatus"] = "published",
+  ): Promise<string[]> {
+    const value =
+      companyListFiltersSchema.shape.publicationStatus.parse(publicationStatus);
+    const result = await this.db
+      .prepare(
+        `SELECT DISTINCT industry
+         FROM companies
+         WHERE publication_status = ?1 AND industry IS NOT NULL
+         ORDER BY industry ASC`,
+      )
+      .bind(value)
+      .all<{ industry: string }>();
+
+    return result.results.map((row) => row.industry);
   }
 
   async update(id: string, input: UpdateCompanyInput): Promise<Company | null> {

@@ -23,8 +23,16 @@ remotory_project/
 │  └─ 01_initial_codex_prompt.md
 ├─ src/
 │  ├─ app/
-│  ├─ components/
+│  │  ├─ (public)/
+│  │  │  ├─ companies/[slug]/
+│  │  │  ├─ about/
+│  │  │  └─ criteria/
+│  │  └─ globals.css
+│  ├─ components/layout/
 │  ├─ config/
+│  ├─ features/companies/
+│  │  ├─ components/
+│  │  └─ server/
 │  ├─ server/db/
 │  │  └─ repositories/
 │  ├─ types/

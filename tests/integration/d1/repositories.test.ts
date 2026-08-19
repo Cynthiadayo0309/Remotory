@@ -32,6 +32,32 @@ describe("D1 repositories", () => {
       publicationStatus: "published",
     });
     expect(listed.map((company) => company.id)).toEqual([created.id]);
+    expect(
+      await repositories.companies.findPublishedBySlug("test-company"),
+    ).toEqual(updated);
+    expect(
+      await repositories.companies.count({ publicationStatus: "published" }),
+    ).toBe(1);
+    expect(await repositories.companies.listIndustries("published")).toEqual([
+      "ソフトウェア",
+    ]);
+
+    const reviewOnly = await repositories.companies.create({
+      ...baseCompanyInput,
+      slug: "review-only-company",
+      name: "確認待ち株式会社",
+      industry: "コンサルティング",
+      publicationStatus: "needs_review",
+    });
+    expect(
+      await repositories.companies.findPublishedBySlug(reviewOnly.slug),
+    ).toBeNull();
+    expect(
+      await repositories.companies.count({ publicationStatus: "published" }),
+    ).toBe(1);
+    expect(await repositories.companies.listIndustries("published")).toEqual([
+      "ソフトウェア",
+    ]);
 
     expect(await repositories.companies.delete(created.id)).toBe(true);
     expect(await repositories.companies.findById(created.id)).toBeNull();
@@ -62,6 +88,9 @@ describe("D1 repositories", () => {
       lastFetchStatus: "failed",
       consecutiveFailures: 1,
     });
+    expect(
+      await repositories.companySources.listActiveByCompany(company.id),
+    ).toHaveLength(0);
 
     const check = await repositories.companyChecks.create({
       companyId: company.id,
@@ -106,5 +135,37 @@ describe("D1 repositories", () => {
     ).toBe(true);
     expect(await repositories.companyChecks.delete(check.id)).toBe(true);
     expect(await repositories.companySources.delete(source.id)).toBe(true);
+  });
+
+  it("paginates companies in 20-item server-side slices", async ({
+    expect,
+  }) => {
+    const repositories = createRepositories(env.DB);
+    for (let index = 1; index <= 21; index += 1) {
+      const suffix = String(index).padStart(2, "0");
+      await repositories.companies.create({
+        ...baseCompanyInput,
+        slug: `page-company-${suffix}`,
+        name: `ページ確認株式会社${suffix}`,
+      });
+    }
+
+    const firstPage = await repositories.companies.list({
+      publicationStatus: "published",
+      limit: 20,
+      offset: 0,
+    });
+    const secondPage = await repositories.companies.list({
+      publicationStatus: "published",
+      limit: 20,
+      offset: 20,
+    });
+
+    expect(firstPage).toHaveLength(20);
+    expect(secondPage).toHaveLength(1);
+    expect(secondPage[0]?.slug).toBe("page-company-21");
+    expect(
+      await repositories.companies.count({ publicationStatus: "published" }),
+    ).toBe(21);
   });
 });

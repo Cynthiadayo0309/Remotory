@@ -85,6 +85,20 @@ export class CompanySourceRepository {
     return result.results.map(mapCompanySource);
   }
 
+  async listActiveByCompany(companyId: string): Promise<CompanySource[]> {
+    const validCompanyId = idSchema.parse(companyId);
+    const result = await this.db
+      .prepare(
+        `SELECT ${SOURCE_COLUMNS}
+         FROM company_sources
+         WHERE company_id = ?1 AND is_active = 1
+         ORDER BY created_at ASC, id ASC`,
+      )
+      .bind(validCompanyId)
+      .all<CompanySourceRow>();
+    return result.results.map(mapCompanySource);
+  }
+
   async update(
     id: string,
     input: UpdateCompanySourceInput,
