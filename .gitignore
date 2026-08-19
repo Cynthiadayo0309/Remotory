@@ -12,6 +12,7 @@
 /.next
 /.open-next
 /.wrangler
+/wrangler.remote.jsonc
 /out
 /build
 

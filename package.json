@@ -12,9 +12,13 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "npm run test:unit && npm run test:d1",
+    "test:unit": "vitest run --config vitest.config.mts",
+    "test:d1": "vitest run --config vitest.d1.config.mts",
+    "test:watch": "vitest --config vitest.config.mts",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
+    "db:migrate:local": "wrangler d1 migrations apply remotory-local --local",
+    "db:seed:local": "wrangler d1 execute remotory-local --local --file db/seed.sql",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
@@ -25,9 +29,11 @@
     "@opennextjs/cloudflare": "1.20.2",
     "next": "16.3.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",

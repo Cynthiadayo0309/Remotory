@@ -8,6 +8,6 @@ cloudflare-env.d.ts
 AGENTS.md
 README.md
 PROJECT_TREE.txt
-db
-docs
-prompts
+/db
+/docs
+/prompts

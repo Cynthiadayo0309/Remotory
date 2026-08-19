@@ -42,6 +42,16 @@ Remotory は、日本に拠点があり、フルリモートで働けるポジ�
 - `docs/05_non_functional_requirements.md` — 非機能要件
 - `docs/06_mvp_scope.md` — MVP範囲
 - `docs/07_implementation_order.md` — 実装順序
+- `docs/08_local_d1_development.md` — ローカルD1の利用方法
 - `db/0001_initial_schema.sql` — D1初期スキーマ
 - `AGENTS.md` — Codex向け常設指示
 - `prompts/01_initial_codex_prompt.md` — Codexへの初回指示
+
+## ローカルD1
+
+```sh
+npm run db:migrate:local
+npm run db:seed:local
+```
+
+標準コマンドはローカルD1だけを対象とします。リモート環境との切り替え方は `docs/08_local_d1_development.md` を参照してください。
