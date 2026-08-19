@@ -1,0 +1,41 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# tests
+/coverage
+/test-results
+/playwright-report
+
+# Next.js / OpenNext / Cloudflare
+/.next
+/.open-next
+/.wrangler
+/out
+/build
+
+# local environment and secrets
+.env*
+.dev.vars*
+!.env.example
+!.dev.vars.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# tooling
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

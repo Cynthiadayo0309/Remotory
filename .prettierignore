@@ -1,0 +1,13 @@
+.next
+.open-next
+.wrangler
+coverage
+node_modules
+package-lock.json
+cloudflare-env.d.ts
+AGENTS.md
+README.md
+PROJECT_TREE.txt
+db
+docs
+prompts
