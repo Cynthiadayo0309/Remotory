@@ -159,6 +159,21 @@ export class CompanyRepository {
     return result.results.map((row) => row.industry);
   }
 
+  async listRecentlyUpdated(limit = 5): Promise<Company[]> {
+    const validLimit = companyListFiltersSchema.shape.limit.parse(limit);
+    const result = await this.db
+      .prepare(
+        `SELECT ${COMPANY_COLUMNS}
+         FROM companies
+         ORDER BY updated_at DESC, id DESC
+         LIMIT ?1`,
+      )
+      .bind(validLimit)
+      .all<CompanyRow>();
+
+    return result.results.map(mapCompany);
+  }
+
   async update(id: string, input: UpdateCompanyInput): Promise<Company | null> {
     const validId = idSchema.parse(id);
     const value = updateCompanySchema.parse(input);

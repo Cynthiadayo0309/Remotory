@@ -110,6 +110,22 @@ export class CompanyChangeCandidateRepository {
     return result.results.map(mapCompanyChangeCandidate);
   }
 
+  async countByReviewStatus(reviewStatus: ReviewStatus): Promise<number> {
+    const validStatus = createCompanyChangeCandidateSchema.shape.reviewStatus
+      .unwrap()
+      .parse(reviewStatus);
+    const row = await this.db
+      .prepare(
+        `SELECT COUNT(*) AS count
+         FROM company_change_candidates
+         WHERE review_status = ?1`,
+      )
+      .bind(validStatus)
+      .first<{ count: number }>();
+
+    return row?.count ?? 0;
+  }
+
   async update(
     id: string,
     input: UpdateCompanyChangeCandidateInput,

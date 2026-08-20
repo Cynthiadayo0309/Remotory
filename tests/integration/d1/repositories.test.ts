@@ -168,4 +168,38 @@ describe("D1 repositories", () => {
       await repositories.companies.count({ publicationStatus: "published" }),
     ).toBe(21);
   });
+
+  it("provides dashboard counts and recent updates", async ({ expect }) => {
+    let now = "2026-08-20T01:00:00.000Z";
+    const repositories = createRepositories(env.DB, {
+      now: () => now,
+    });
+    const first = await repositories.companies.create(baseCompanyInput);
+    await repositories.companies.create({
+      ...baseCompanyInput,
+      slug: "review-company",
+      name: "要確認株式会社",
+      publicationStatus: "needs_review",
+    });
+    now = "2026-08-20T02:00:00.000Z";
+    await repositories.companies.update(first.id, { name: "更新企業株式会社" });
+    await repositories.companyChangeCandidates.create({
+      companyId: first.id,
+      fieldName: "recruiting_status",
+      newValue: "closed",
+    });
+
+    expect(await repositories.companies.count()).toBe(2);
+    expect(
+      await repositories.companies.count({
+        publicationStatus: "needs_review",
+      }),
+    ).toBe(1);
+    expect(
+      await repositories.companyChangeCandidates.countByReviewStatus("pending"),
+    ).toBe(1);
+    expect((await repositories.companies.listRecentlyUpdated(1))[0]?.id).toBe(
+      first.id,
+    );
+  });
 });

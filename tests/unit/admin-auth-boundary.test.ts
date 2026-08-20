@@ -3,6 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { withAdminAuth } from "@/server/auth";
 import { config, middleware } from "@/middleware";
+import { POST as createCompany } from "@/app/api/admin/companies/route";
+import { PATCH as updateCompany } from "@/app/api/admin/companies/[id]/route";
+import { POST as createSource } from "@/app/api/admin/companies/[id]/sources/route";
+import { PATCH as updateSource } from "@/app/api/admin/companies/[id]/sources/[sourceId]/route";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -44,4 +48,39 @@ describe("admin auth boundaries", () => {
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({ error: "forbidden" });
   });
+
+  it.each([
+    [
+      "company create",
+      createCompany,
+      "https://example.com/api/admin/companies",
+      "POST",
+    ],
+    [
+      "company update",
+      updateCompany,
+      "https://example.com/api/admin/companies/00000000-0000-4000-8000-000000000000",
+      "PATCH",
+    ],
+    [
+      "source create",
+      createSource,
+      "https://example.com/api/admin/companies/00000000-0000-4000-8000-000000000000/sources",
+      "POST",
+    ],
+    [
+      "source update",
+      updateSource,
+      "https://example.com/api/admin/companies/00000000-0000-4000-8000-000000000000/sources/00000000-0000-4000-8000-000000000001",
+      "PATCH",
+    ],
+  ])(
+    "protects the %s endpoint independently",
+    async (_, handler, url, method) => {
+      vi.stubEnv("NODE_ENV", "test");
+      const response = await handler(new Request(url, { method }));
+      expect(response.status).toBe(403);
+      await expect(response.json()).resolves.toEqual({ error: "forbidden" });
+    },
+  );
 });
