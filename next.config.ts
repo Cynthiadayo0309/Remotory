@@ -9,4 +9,6 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-initOpenNextCloudflareForDev();
+initOpenNextCloudflareForDev({
+  remoteBindings: process.env.REMOTORY_ENABLE_REMOTE_BINDINGS === "true",
+});
