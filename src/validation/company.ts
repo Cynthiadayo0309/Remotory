@@ -24,6 +24,11 @@ const nullableHttpUrl = z
   .nullable();
 
 export const idSchema = z.string().uuid();
+export const contentHashSchema = z.string().regex(/^[a-f0-9]{64}$/);
+export const sourceFetchRecordSchema = z.object({
+  checkedAt: z.string().datetime({ offset: true }),
+  observedContentHash: contentHashSchema,
+});
 export const slugSchema = z
   .string()
   .trim()

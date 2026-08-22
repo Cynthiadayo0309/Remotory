@@ -9,6 +9,7 @@ import type { CompanySource } from "@/types/company";
 import {
   createCompanySourceSchema,
   idSchema,
+  sourceFetchRecordSchema,
   updateCompanySourceSchema,
   type CreateCompanySourceInput,
   type UpdateCompanySourceInput,
@@ -97,6 +98,57 @@ export class CompanySourceRepository {
       .bind(validCompanyId)
       .all<CompanySourceRow>();
     return result.results.map(mapCompanySource);
+  }
+
+  async recordFetchSuccess(
+    id: string,
+    checkedAt: string,
+    observedContentHash: string,
+  ): Promise<CompanySource | null> {
+    const validId = idSchema.parse(id);
+    const value = sourceFetchRecordSchema.parse({
+      checkedAt,
+      observedContentHash,
+    });
+    await this.db
+      .prepare(
+        `UPDATE company_sources
+         SET last_checked_at = ?1,
+             last_content_hash = COALESCE(last_content_hash, ?2),
+             last_fetch_status = 'success',
+             consecutive_failures = 0,
+             updated_at = ?3
+         WHERE id = ?4`,
+      )
+      .bind(
+        value.checkedAt,
+        value.observedContentHash,
+        this.dependencies.now(),
+        validId,
+      )
+      .run();
+    return this.findById(validId);
+  }
+
+  async recordFetchFailure(
+    id: string,
+    checkedAt: string,
+  ): Promise<CompanySource | null> {
+    const validId = idSchema.parse(id);
+    const validCheckedAt =
+      sourceFetchRecordSchema.shape.checkedAt.parse(checkedAt);
+    await this.db
+      .prepare(
+        `UPDATE company_sources
+         SET last_checked_at = ?1,
+             last_fetch_status = 'failed',
+             consecutive_failures = consecutive_failures + 1,
+             updated_at = ?2
+         WHERE id = ?3`,
+      )
+      .bind(validCheckedAt, this.dependencies.now(), validId)
+      .run();
+    return this.findById(validId);
   }
 
   async update(
