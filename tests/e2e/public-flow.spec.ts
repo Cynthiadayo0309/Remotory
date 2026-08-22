@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+const expectedOrigin = new URL(
+  process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3100",
+).origin;
+
 test("search filters are persisted in the URL and applied by the server", async ({
   page,
 }) => {
@@ -61,6 +65,17 @@ test("public metadata provides a canonical URL and Japanese title", async ({
   await expect(page).toHaveTitle("掲載基準 | Remotory");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "http://127.0.0.1:3100/criteria",
+    `${expectedOrigin}/criteria`,
   );
+});
+
+test("remote admin routes reject unauthenticated requests", async ({
+  request,
+}) => {
+  test.skip(!process.env.PLAYWRIGHT_BASE_URL, "remote preview only");
+
+  for (const path of ["/admin", "/api/admin/session"]) {
+    const response = await request.get(path, { maxRedirects: 0 });
+    expect([302, 303, 307, 403]).toContain(response.status());
+  }
 });

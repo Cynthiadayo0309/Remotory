@@ -31,4 +31,49 @@
   "observability": {
     "enabled": true,
   },
+  "env": {
+    "preview": {
+      "name": "remotory-preview",
+      "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS",
+      },
+      "vars": {
+        "REMOTORY_AUTH_DEV_BYPASS": "false",
+        "REMOTORY_ENABLE_REMOTE_BINDINGS": "false",
+        "REMOTORY_SITE_URL": "https://remotory-preview.teyontt0309.workers.dev",
+        "REMOTORY_ALLOW_INDEXING": "false",
+      },
+      "secrets": {
+        "required": [
+          "CLOUDFLARE_ACCESS_TEAM_DOMAIN",
+          "CLOUDFLARE_ACCESS_AUD",
+          "REMOTORY_ADMIN_EMAIL",
+        ],
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "remotory-preview",
+          "database_id": "f7a927c0-67dd-465d-aa50-c2d62fe3741c",
+          "migrations_dir": "db/migrations",
+          "remote": true,
+        },
+      ],
+      "ai": {
+        "binding": "AI",
+        "remote": true,
+      },
+      "workflows": [
+        {
+          "name": "remotory-company-update-preview",
+          "binding": "COMPANY_UPDATE_WORKFLOW",
+          "class_name": "CompanyUpdateWorkflow",
+        },
+      ],
+      "observability": {
+        "enabled": true,
+      },
+    },
+  },
 }

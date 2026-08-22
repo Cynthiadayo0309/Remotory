@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const pages = [
+const publicPages = [
   { name: "home", path: "/", heading: "フルリモートで働ける企業を探す" },
   {
     name: "company-detail",
@@ -9,6 +9,9 @@ const pages = [
   },
   { name: "criteria", path: "/criteria", heading: "掲載基準" },
   { name: "about", path: "/about", heading: "Remotoryについて" },
+] as const;
+
+const localAdminPages = [
   { name: "admin", path: "/admin", heading: "管理ダッシュボード" },
   {
     name: "admin-update",
@@ -16,6 +19,10 @@ const pages = [
     heading: "全企業の情報を更新",
   },
 ] as const;
+
+const pages = process.env.PLAYWRIGHT_BASE_URL
+  ? publicPages
+  : [...publicPages, ...localAdminPages];
 
 for (const target of pages) {
   test(`${target.name} is responsive and captures a screenshot`, async ({

@@ -22,9 +22,12 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
     "db:migrate:local": "wrangler d1 migrations apply remotory-local --local",
     "db:seed:local": "wrangler d1 execute remotory-local --local --file db/seed.sql",
+    "db:migrate:preview": "wrangler d1 migrations apply remotory-preview --remote --env preview",
+    "db:seed:preview": "wrangler d1 execute remotory-preview --remote --env preview --file db/seed.sql",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:preview": "node scripts/deploy-preview.mjs",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env preview --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@heroui/react": "3.2.4",

@@ -1,14 +1,21 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const routes = [
+const publicRoutes = [
   { path: "/", heading: "フルリモートで働ける企業を探す" },
   { path: "/companies/remote-leaf", heading: "株式会社リモートリーフ" },
   { path: "/criteria", heading: "掲載基準" },
   { path: "/about", heading: "Remotoryについて" },
+] as const;
+
+const localAdminRoutes = [
   { path: "/admin", heading: "管理ダッシュボード" },
   { path: "/admin/update", heading: "全企業の情報を更新" },
 ] as const;
+
+const routes = process.env.PLAYWRIGHT_BASE_URL
+  ? publicRoutes
+  : [...publicRoutes, ...localAdminRoutes];
 
 for (const route of routes) {
   test(`${route.path} has no detectable WCAG A/AA violations`, async ({
