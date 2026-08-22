@@ -9,7 +9,9 @@ import type {
   CompanyCheckRow,
   CompanyRow,
   CompanySourceRow,
+  CompanyUpdateRunRow,
 } from "@/server/db/rows";
+import type { CompanyUpdateRun } from "@/types/update-run";
 
 export function mapCompany(row: CompanyRow): Company {
   return {
@@ -84,5 +86,27 @@ export function mapCompanyChangeCandidate(
     reviewStatus: row.review_status,
     reviewedAt: row.reviewed_at,
     createdAt: row.created_at,
+  };
+}
+
+export function mapCompanyUpdateRun(
+  row: CompanyUpdateRunRow,
+): CompanyUpdateRun {
+  return {
+    id: row.id,
+    workflowInstanceId: row.workflow_instance_id,
+    status: row.status,
+    totalCompanies: row.total_companies,
+    processedCompanies: row.processed_companies,
+    unchangedCompanies: row.unchanged_companies,
+    changedCompanies: row.changed_companies,
+    needsReviewCompanies: row.needs_review_companies,
+    failedCompanies: row.failed_companies,
+    candidateCount: row.candidate_count,
+    errorMessage: row.error_message,
+    startedAt: row.started_at,
+    completedAt: row.completed_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }

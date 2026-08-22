@@ -165,6 +165,79 @@ describe("change candidate review", () => {
     ).toHaveLength(1);
   });
 
+  it("keeps conflicting candidates from different sources separate", async ({
+    expect,
+  }) => {
+    const repositories = createRepositories(env.DB);
+    const company = await repositories.companies.create(baseCompanyInput);
+    const check = await repositories.companyChecks.create({
+      companyId: company.id,
+      status: "needs_review",
+      contentChanged: true,
+      aiUsed: true,
+    });
+    await repositories.companyChangeCandidates.createManyForCheckIfAbsent([
+      {
+        companyId: company.id,
+        checkId: check.id,
+        fieldName: "recruiting_status",
+        oldValue: "open",
+        newValue: "closed",
+        sourceUrl: "https://example.com/careers",
+      },
+      {
+        companyId: company.id,
+        checkId: check.id,
+        fieldName: "recruiting_status",
+        oldValue: "open",
+        newValue: "unknown",
+        sourceUrl: "https://example.com/jobs",
+      },
+    ]);
+
+    await expect(
+      repositories.companyChangeCandidates.listByCheck(check.id),
+    ).resolves.toHaveLength(2);
+  });
+
+  it("uses the original check completion time as the verification time", async ({
+    expect,
+  }) => {
+    const reviewTime = "2026-08-22T08:00:00.000Z";
+    const checkTime = "2026-08-22T07:00:00.000Z";
+    const repositories = createRepositories(env.DB, {
+      now: () => reviewTime,
+    });
+    const company = await repositories.companies.create(baseCompanyInput);
+    const check = await repositories.companyChecks.create({
+      companyId: company.id,
+      status: "changed",
+      completedAt: checkTime,
+      contentChanged: true,
+      aiUsed: true,
+    });
+    const candidate = await repositories.companyChangeCandidates.create({
+      companyId: company.id,
+      checkId: check.id,
+      fieldName: "recruiting_status",
+      oldValue: "open",
+      newValue: "closed",
+    });
+
+    const result = await repositories.companyChangeReviews.approve(
+      candidate.id,
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      company: {
+        recruitingStatus: "closed",
+        lastVerifiedAt: checkTime,
+        recruitingVerifiedAt: checkTime,
+        updatedAt: reviewTime,
+      },
+    });
+  });
+
   it("persists AI diffs only for a check belonging to the same company", async ({
     expect,
   }) => {

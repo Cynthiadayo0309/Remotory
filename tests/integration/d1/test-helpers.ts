@@ -18,6 +18,8 @@ export const baseCompanyInput: CreateCompanyInput = {
 
 export async function clearDatabase(): Promise<void> {
   await env.DB.batch([
+    env.DB.prepare("DELETE FROM company_update_run_checks"),
+    env.DB.prepare("DELETE FROM company_update_runs"),
     env.DB.prepare("DELETE FROM company_change_candidates"),
     env.DB.prepare("DELETE FROM company_checks"),
     env.DB.prepare("DELETE FROM company_sources"),

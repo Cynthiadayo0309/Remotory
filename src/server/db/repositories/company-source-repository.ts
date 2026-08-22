@@ -151,6 +151,26 @@ export class CompanySourceRepository {
     return this.findById(validId);
   }
 
+  async commitContentHash(
+    id: string,
+    observedContentHash: string,
+  ): Promise<CompanySource | null> {
+    const validId = idSchema.parse(id);
+    const validHash =
+      sourceFetchRecordSchema.shape.observedContentHash.parse(
+        observedContentHash,
+      );
+    await this.db
+      .prepare(
+        `UPDATE company_sources
+         SET last_content_hash = ?1, updated_at = ?2
+         WHERE id = ?3`,
+      )
+      .bind(validHash, this.dependencies.now(), validId)
+      .run();
+    return this.findById(validId);
+  }
+
   async update(
     id: string,
     input: UpdateCompanySourceInput,

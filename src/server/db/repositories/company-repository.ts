@@ -174,6 +174,25 @@ export class CompanyRepository {
     return result.results.map(mapCompany);
   }
 
+  async markVerified(id: string, verifiedAt: string): Promise<Company | null> {
+    const validId = idSchema.parse(id);
+    const timestamp = createCompanySchema.shape.lastVerifiedAt
+      .unwrap()
+      .parse(verifiedAt);
+    await this.db
+      .prepare(
+        `UPDATE companies
+         SET last_verified_at = ?1,
+             remote_verified_at = ?1,
+             recruiting_verified_at = ?1,
+             updated_at = ?1
+         WHERE id = ?2`,
+      )
+      .bind(timestamp, validId)
+      .run();
+    return this.findById(validId);
+  }
+
   async update(id: string, input: UpdateCompanyInput): Promise<Company | null> {
     const validId = idSchema.parse(id);
     const value = updateCompanySchema.parse(input);

@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "remotory",
-  "main": ".open-next/worker.js",
+  "main": "worker.ts",
   "compatibility_date": "2026-08-19",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
@@ -21,6 +21,13 @@
     "binding": "AI",
     "remote": true,
   },
+  "workflows": [
+    {
+      "name": "remotory-company-update",
+      "binding": "COMPANY_UPDATE_WORKFLOW",
+      "class_name": "CompanyUpdateWorkflow",
+    },
+  ],
   "observability": {
     "enabled": true,
   },

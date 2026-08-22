@@ -5,6 +5,7 @@ import {
   CompanyCheckRepository,
   CompanyRepository,
   CompanySourceRepository,
+  CompanyUpdateRunRepository,
 } from "@/server/db/repositories";
 
 export function createRepositories(
@@ -20,5 +21,6 @@ export function createRepositories(
       dependencies,
     ),
     companyChangeReviews: new CompanyChangeReviewRepository(db, dependencies),
+    companyUpdateRuns: new CompanyUpdateRunRepository(db, dependencies),
   };
 }

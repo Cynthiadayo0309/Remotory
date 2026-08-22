@@ -48,15 +48,31 @@ export async function getAdminCompany(
 
 export async function getAdminDashboard() {
   const repositories = createRepositories(getDatabase());
-  const [total, published, needsReview, hidden, pendingCandidates, recent] =
-    await Promise.all([
-      repositories.companies.count(),
-      repositories.companies.count({ publicationStatus: "published" }),
-      repositories.companies.count({ publicationStatus: "needs_review" }),
-      repositories.companies.count({ publicationStatus: "hidden" }),
-      repositories.companyChangeCandidates.countByReviewStatus("pending"),
-      repositories.companies.listRecentlyUpdated(5),
-    ]);
+  const [
+    total,
+    published,
+    needsReview,
+    hidden,
+    pendingCandidates,
+    recent,
+    latestUpdateRun,
+  ] = await Promise.all([
+    repositories.companies.count(),
+    repositories.companies.count({ publicationStatus: "published" }),
+    repositories.companies.count({ publicationStatus: "needs_review" }),
+    repositories.companies.count({ publicationStatus: "hidden" }),
+    repositories.companyChangeCandidates.countByReviewStatus("pending"),
+    repositories.companies.listRecentlyUpdated(5),
+    repositories.companyUpdateRuns.findLatest(),
+  ]);
 
-  return { total, published, needsReview, hidden, pendingCandidates, recent };
+  return {
+    total,
+    published,
+    needsReview,
+    hidden,
+    pendingCandidates,
+    recent,
+    latestUpdateRun,
+  };
 }

@@ -123,6 +123,10 @@ export class CompanyChangeReviewRepository {
     }
 
     const column = FIELD_COLUMNS[candidate.fieldName];
+    const verificationColumn =
+      candidate.fieldName === "recruiting_status"
+        ? "recruiting_verified_at"
+        : "remote_verified_at";
     const newValue = parseNewValue(candidate.fieldName, candidate.newValue);
     const reviewedAt = this.dependencies.now();
     const results = await this.db.batch([
@@ -141,7 +145,28 @@ export class CompanyChangeReviewRepository {
       this.db
         .prepare(
           `UPDATE companies
-           SET ${column} = ?1, updated_at = ?2
+           SET ${column} = ?1,
+               ${verificationColumn} = COALESCE(
+                 (
+                   SELECT company_checks.completed_at
+                   FROM company_change_candidates
+                   JOIN company_checks
+                     ON company_checks.id = company_change_candidates.check_id
+                   WHERE company_change_candidates.id = ?4
+                 ),
+                 ${verificationColumn}
+               ),
+               last_verified_at = COALESCE(
+                 (
+                   SELECT company_checks.completed_at
+                   FROM company_change_candidates
+                   JOIN company_checks
+                     ON company_checks.id = company_change_candidates.check_id
+                   WHERE company_change_candidates.id = ?4
+                 ),
+                 last_verified_at
+               ),
+               updated_at = ?2
            WHERE id = ?3
              AND EXISTS (
                SELECT 1 FROM company_change_candidates

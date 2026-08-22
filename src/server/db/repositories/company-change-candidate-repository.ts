@@ -102,6 +102,29 @@ export class CompanyChangeCandidateRepository {
     return row ? mapCompanyChangeCandidate(row) : null;
   }
 
+  async findByCheckFieldAndSource(
+    checkId: string,
+    fieldName: ChangeCandidateField,
+    sourceUrl: string | null,
+  ): Promise<CompanyChangeCandidate | null> {
+    const validCheckId = idSchema.parse(checkId);
+    const validFieldName =
+      createCompanyChangeCandidateSchema.shape.fieldName.parse(fieldName);
+    const validSourceUrl =
+      createCompanyChangeCandidateSchema.shape.sourceUrl.parse(sourceUrl);
+    const row = await this.db
+      .prepare(
+        `SELECT ${CANDIDATE_COLUMNS}
+         FROM company_change_candidates
+         WHERE check_id = ?1 AND field_name = ?2 AND source_url IS ?3
+         ORDER BY created_at ASC, id ASC
+         LIMIT 1`,
+      )
+      .bind(validCheckId, validFieldName, validSourceUrl)
+      .first<CompanyChangeCandidateRow>();
+    return row ? mapCompanyChangeCandidate(row) : null;
+  }
+
   async createManyForCheckIfAbsent(
     inputs: CreateCompanyChangeCandidateInput[],
   ): Promise<CompanyChangeCandidate[]> {
@@ -128,7 +151,7 @@ export class CompanyChangeCandidateRepository {
              WHERE NOT EXISTS (
                SELECT 1
                FROM company_change_candidates
-               WHERE check_id = ?3 AND field_name = ?4
+               WHERE check_id = ?3 AND field_name = ?4 AND source_url IS ?8
              )`,
           )
           .bind(
@@ -148,7 +171,11 @@ export class CompanyChangeCandidateRepository {
 
     const candidates = await Promise.all(
       values.map(({ value }) =>
-        this.findByCheckAndField(value.checkId!, value.fieldName),
+        this.findByCheckFieldAndSource(
+          value.checkId!,
+          value.fieldName,
+          value.sourceUrl,
+        ),
       ),
     );
 
@@ -169,6 +196,20 @@ export class CompanyChangeCandidateRepository {
          ORDER BY created_at DESC, id DESC`,
       )
       .bind(validCompanyId)
+      .all<CompanyChangeCandidateRow>();
+    return result.results.map(mapCompanyChangeCandidate);
+  }
+
+  async listByCheck(checkId: string): Promise<CompanyChangeCandidate[]> {
+    const validCheckId = idSchema.parse(checkId);
+    const result = await this.db
+      .prepare(
+        `SELECT ${CANDIDATE_COLUMNS}
+         FROM company_change_candidates
+         WHERE check_id = ?1
+         ORDER BY created_at ASC, id ASC`,
+      )
+      .bind(validCheckId)
       .all<CompanyChangeCandidateRow>();
     return result.results.map(mapCompanyChangeCandidate);
   }

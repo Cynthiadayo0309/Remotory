@@ -2,6 +2,10 @@ import Link from "next/link";
 
 import { formatAdminDate } from "@/features/admin/companies/admin-presentation";
 import { getAdminDashboard } from "@/features/admin/companies/server/admin-company-queries";
+import {
+  formatUpdateRunDate,
+  updateRunStatusLabels,
+} from "@/features/admin/update-runs/update-run-presentation";
 
 export const dynamic = "force-dynamic";
 
@@ -108,22 +112,35 @@ export default async function AdminDashboardPage() {
           <dl className="mt-5 space-y-3">
             <div className="flex justify-between gap-4 text-sm">
               <dt className="text-zinc-500">前回実行日時</dt>
-              <dd className="font-medium text-zinc-900">未実行</dd>
+              <dd className="font-medium text-zinc-900">
+                {dashboard.latestUpdateRun
+                  ? formatUpdateRunDate(
+                      dashboard.latestUpdateRun.startedAt ??
+                        dashboard.latestUpdateRun.createdAt,
+                    )
+                  : "未実行"}
+              </dd>
             </div>
+            {dashboard.latestUpdateRun && (
+              <div className="flex justify-between gap-4 text-sm">
+                <dt className="text-zinc-500">状態</dt>
+                <dd className="font-medium text-zinc-900">
+                  {updateRunStatusLabels[dashboard.latestUpdateRun.status]}
+                </dd>
+              </div>
+            )}
           </dl>
-          <button
-            type="button"
-            disabled
-            className="mt-6 inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-xl bg-zinc-200 px-4 font-semibold text-zinc-500"
-            aria-describedby="bulk-update-note"
+          <Link
+            href="/admin/update"
+            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-blue-700 px-4 font-semibold text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
-            全企業の情報を更新
-          </button>
+            一括確認を開く
+          </Link>
           <p
             id="bulk-update-note"
             className="mt-3 text-sm leading-6 text-zinc-500"
           >
-            ページ取得基盤とWorkflowを実装するStep 6〜9で有効になります。
+            変更候補は管理者が承認するまで公開情報へ反映されません。
           </p>
         </section>
       </div>

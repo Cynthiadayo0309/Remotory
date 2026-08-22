@@ -10,6 +10,7 @@ import type {
   SourceType,
   WorkLocationScope,
 } from "@/types/company";
+import type { CompanyUpdateRunStatus } from "@/types/update-run";
 
 export interface CompanyRow {
   id: string;
@@ -74,4 +75,22 @@ export interface CompanyChangeCandidateRow {
   review_status: ReviewStatus;
   reviewed_at: string | null;
   created_at: string;
+}
+
+export interface CompanyUpdateRunRow {
+  id: string;
+  workflow_instance_id: string;
+  status: CompanyUpdateRunStatus;
+  total_companies: number;
+  processed_companies: number;
+  unchanged_companies: number;
+  changed_companies: number;
+  needs_review_companies: number;
+  failed_companies: number;
+  candidate_count: number;
+  error_message: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
