@@ -24,12 +24,22 @@ export async function generateMetadata({
   params,
 }: CompanyPageProps): Promise<Metadata> {
   const detail = await getPublicCompanyBySlug((await params).slug);
-  if (!detail) return { title: "企業が見つかりません | Remotory" };
+  if (!detail) return { title: "企業が見つかりません", robots: "noindex" };
   return {
-    title: `${detail.company.name} | Remotory`,
+    title: detail.company.name,
     description:
       detail.company.description ??
       `${detail.company.name}のフルリモート勤務条件と募集状況`,
+    alternates: { canonical: `/companies/${detail.company.slug}` },
+    openGraph: {
+      title: detail.company.name,
+      description:
+        detail.company.description ??
+        `${detail.company.name}のフルリモート勤務条件と募集状況`,
+      siteName: "Remotory",
+      locale: "ja_JP",
+      type: "website",
+    },
   };
 }
 

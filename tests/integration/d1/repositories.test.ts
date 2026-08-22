@@ -41,6 +41,9 @@ describe("D1 repositories", () => {
     expect(await repositories.companies.listIndustries("published")).toEqual([
       "ソフトウェア",
     ]);
+    expect(await repositories.companies.listPublishedSitemapEntries()).toEqual([
+      { slug: updated?.slug, updatedAt: updated?.updatedAt },
+    ]);
 
     const reviewOnly = await repositories.companies.create({
       ...baseCompanyInput,
@@ -57,6 +60,9 @@ describe("D1 repositories", () => {
     ).toBe(1);
     expect(await repositories.companies.listIndustries("published")).toEqual([
       "ソフトウェア",
+    ]);
+    expect(await repositories.companies.listPublishedSitemapEntries()).toEqual([
+      { slug: updated?.slug, updatedAt: updated?.updatedAt },
     ]);
 
     expect(await repositories.companies.delete(created.id)).toBe(true);

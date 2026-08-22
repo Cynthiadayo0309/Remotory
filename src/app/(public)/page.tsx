@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CompanyCard } from "@/features/companies/components/company-card";
@@ -10,6 +11,13 @@ import {
 import { getPublicCompanyListing } from "@/features/companies/server/public-company-queries";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "フルリモートで働ける企業を探す",
+  description:
+    "日本に拠点があり、フルリモート勤務が可能な企業を、勤務条件・募集状況・最終確認日とともに探せます。",
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage({
   searchParams,

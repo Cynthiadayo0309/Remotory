@@ -76,3 +76,9 @@ export async function getPublicCompanyBySlug(
     sources,
   };
 }
+
+export async function getPublicCompanySitemapEntries() {
+  return createRepositories(
+    getDatabase(),
+  ).companies.listPublishedSitemapEntries();
+}

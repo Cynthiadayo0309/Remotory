@@ -4,7 +4,11 @@ import { CompanyForm } from "@/features/admin/companies/components/company-form"
 
 export default function NewCompanyPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14"
+    >
       <Link
         href="/admin/companies"
         className="text-sm font-semibold text-blue-700 hover:text-blue-900"

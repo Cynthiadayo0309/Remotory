@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "掲載基準 | Remotory",
+  title: "掲載基準",
   description: "Remotoryに企業情報を掲載する際の基準をご案内します。",
+  alternates: { canonical: "/criteria" },
+  openGraph: {
+    title: "掲載基準",
+    description: "Remotoryに企業情報を掲載する際の基準をご案内します。",
+    siteName: "Remotory",
+    locale: "ja_JP",
+    type: "website",
+  },
 };
 
 const criteria = [

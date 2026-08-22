@@ -16,6 +16,8 @@
     "test:unit": "vitest run --config vitest.config.mts",
     "test:d1": "vitest run --config vitest.d1.config.mts",
     "test:workers": "vitest run --config vitest.workers.config.mts",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
     "test:watch": "vitest --config vitest.config.mts",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
     "db:migrate:local": "wrangler d1 migrations apply remotory-local --local",
@@ -35,7 +37,9 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@cloudflare/vitest-pool-workers": "^0.22.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",

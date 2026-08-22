@@ -14,7 +14,11 @@ export default async function AdminReviewsPage() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14"
+    >
       <div>
         <p className="text-sm font-semibold tracking-[0.14em] text-blue-700 uppercase">
           Reviews

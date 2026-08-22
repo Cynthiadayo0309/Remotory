@@ -159,6 +159,23 @@ export class CompanyRepository {
     return result.results.map((row) => row.industry);
   }
 
+  async listPublishedSitemapEntries(): Promise<
+    Array<{ slug: string; updatedAt: string }>
+  > {
+    const result = await this.db
+      .prepare(
+        `SELECT slug, updated_at
+         FROM companies
+         WHERE publication_status = 'published'
+         ORDER BY slug ASC`,
+      )
+      .all<{ slug: string; updated_at: string }>();
+    return result.results.map((row) => ({
+      slug: row.slug,
+      updatedAt: row.updated_at,
+    }));
+  }
+
   async listRecentlyUpdated(limit = 5): Promise<Company[]> {
     const validLimit = companyListFiltersSchema.shape.limit.parse(limit);
     const result = await this.db

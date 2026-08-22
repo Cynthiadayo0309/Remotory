@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@heroui/react";
 import { useEffect, useState } from "react";
 
 import {
@@ -80,16 +79,19 @@ export function CompanyUpdatePanel({
         <p className="mt-3 leading-7 text-zinc-600">
           公開中の企業を対象に、有効な情報源の取得・変更判定・必要時のAI解析を行います。変更は候補として保存され、承認するまで公開情報には反映されません。
         </p>
-        <Button
+        <button
           type="button"
-          variant="primary"
-          isPending={starting}
-          isDisabled={starting || active}
-          onPress={start}
-          className="mt-6 min-w-52"
+          disabled={starting || active}
+          aria-busy={starting}
+          onClick={start}
+          className="mt-6 min-h-11 min-w-52 rounded-xl bg-blue-700 px-5 font-semibold text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:bg-zinc-500"
         >
-          {active ? "一括確認を実行中" : "全企業の情報を更新"}
-        </Button>
+          {starting
+            ? "開始しています"
+            : active
+              ? "一括確認を実行中"
+              : "全企業の情報を更新"}
+        </button>
         <p className="mt-3 text-sm leading-6 text-zinc-500">
           一時的な取得・AI障害だけを最大2回再試行します。判断不能や情報源間の競合は自動更新せず、要確認として記録します。
         </p>

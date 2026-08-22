@@ -3,6 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Remotoryについて",
   description: "フルリモートで働ける企業を探すためのRemotoryについて。",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "Remotoryについて",
+    description: "フルリモートで働ける企業を探すためのRemotoryについて。",
+    siteName: "Remotory",
+    locale: "ja_JP",
+    type: "website",
+  },
 };
 
 export default function AboutPage() {

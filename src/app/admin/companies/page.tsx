@@ -33,7 +33,11 @@ export default async function AdminCompaniesPage({
   const listing = await getAdminCompanyListing(search);
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14"
+    >
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
           <p className="text-sm font-semibold tracking-[0.14em] text-blue-700 uppercase">
