@@ -12,7 +12,11 @@ export default async function AdminDashboardPage() {
     { label: "公開中", value: dashboard.published },
     { label: "要確認", value: dashboard.needsReview },
     { label: "掲載停止", value: dashboard.hidden },
-    { label: "変更候補", value: dashboard.pendingCandidates },
+    {
+      label: "変更候補",
+      value: dashboard.pendingCandidates,
+      href: "/admin/reviews",
+    },
   ];
 
   return (
@@ -50,6 +54,14 @@ export default async function AdminDashboardPage() {
             <p className="mt-2 text-3xl font-semibold text-zinc-950">
               {stat.value.toLocaleString("ja-JP")}
             </p>
+            {stat.href && (
+              <Link
+                href={stat.href}
+                className="mt-3 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-900"
+              >
+                確認する
+              </Link>
+            )}
           </div>
         ))}
       </section>

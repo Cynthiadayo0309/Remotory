@@ -3,6 +3,7 @@ import Link from "next/link";
 const links = [
   { href: "/admin", label: "ダッシュボード" },
   { href: "/admin/companies", label: "企業管理" },
+  { href: "/admin/reviews", label: "変更レビュー" },
 ];
 
 export function AdminHeader() {

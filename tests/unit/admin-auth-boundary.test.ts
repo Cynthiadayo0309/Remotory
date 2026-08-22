@@ -7,6 +7,7 @@ import { POST as createCompany } from "@/app/api/admin/companies/route";
 import { PATCH as updateCompany } from "@/app/api/admin/companies/[id]/route";
 import { POST as createSource } from "@/app/api/admin/companies/[id]/sources/route";
 import { PATCH as updateSource } from "@/app/api/admin/companies/[id]/sources/[sourceId]/route";
+import { POST as reviewCandidate } from "@/app/api/admin/reviews/[id]/route";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -73,6 +74,12 @@ describe("admin auth boundaries", () => {
       updateSource,
       "https://example.com/api/admin/companies/00000000-0000-4000-8000-000000000000/sources/00000000-0000-4000-8000-000000000001",
       "PATCH",
+    ],
+    [
+      "candidate review",
+      reviewCandidate,
+      "https://example.com/api/admin/reviews/00000000-0000-4000-8000-000000000002",
+      "POST",
     ],
   ])(
     "protects the %s endpoint independently",

@@ -1,6 +1,7 @@
 import type { RepositoryDependencies } from "@/server/db/repository-dependencies";
 import {
   CompanyChangeCandidateRepository,
+  CompanyChangeReviewRepository,
   CompanyCheckRepository,
   CompanyRepository,
   CompanySourceRepository,
@@ -18,5 +19,6 @@ export function createRepositories(
       db,
       dependencies,
     ),
+    companyChangeReviews: new CompanyChangeReviewRepository(db, dependencies),
   };
 }

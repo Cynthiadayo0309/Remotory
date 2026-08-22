@@ -5,7 +5,11 @@ import {
   type RepositoryDependencies,
 } from "@/server/db/repository-dependencies";
 import type { CompanyChangeCandidateRow } from "@/server/db/rows";
-import type { CompanyChangeCandidate, ReviewStatus } from "@/types/company";
+import type {
+  ChangeCandidateField,
+  CompanyChangeCandidate,
+  ReviewStatus,
+} from "@/types/company";
 import {
   createCompanyChangeCandidateSchema,
   idSchema,
@@ -76,6 +80,83 @@ export class CompanyChangeCandidateRepository {
       .bind(validId)
       .first<CompanyChangeCandidateRow>();
     return row ? mapCompanyChangeCandidate(row) : null;
+  }
+
+  async findByCheckAndField(
+    checkId: string,
+    fieldName: ChangeCandidateField,
+  ): Promise<CompanyChangeCandidate | null> {
+    const validCheckId = idSchema.parse(checkId);
+    const validFieldName =
+      createCompanyChangeCandidateSchema.shape.fieldName.parse(fieldName);
+    const row = await this.db
+      .prepare(
+        `SELECT ${CANDIDATE_COLUMNS}
+         FROM company_change_candidates
+         WHERE check_id = ?1 AND field_name = ?2
+         ORDER BY created_at ASC, id ASC
+         LIMIT 1`,
+      )
+      .bind(validCheckId, validFieldName)
+      .first<CompanyChangeCandidateRow>();
+    return row ? mapCompanyChangeCandidate(row) : null;
+  }
+
+  async createManyForCheckIfAbsent(
+    inputs: CreateCompanyChangeCandidateInput[],
+  ): Promise<CompanyChangeCandidate[]> {
+    if (inputs.length === 0) return [];
+
+    const timestamp = this.dependencies.now();
+    const values = inputs.map((input) => {
+      const value = createCompanyChangeCandidateSchema.parse(input);
+      if (!value.checkId) {
+        throw new Error("checkId is required for generated change candidates");
+      }
+      if (value.reviewStatus !== "pending" || value.reviewedAt !== null) {
+        throw new Error("Generated change candidates must be pending");
+      }
+      return { id: this.dependencies.generateId(), value };
+    });
+
+    await this.db.batch(
+      values.map(({ id, value }) =>
+        this.db
+          .prepare(
+            `INSERT INTO company_change_candidates (${CANDIDATE_COLUMNS})
+             SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 'pending', NULL, ?10
+             WHERE NOT EXISTS (
+               SELECT 1
+               FROM company_change_candidates
+               WHERE check_id = ?3 AND field_name = ?4
+             )`,
+          )
+          .bind(
+            id,
+            value.companyId,
+            value.checkId,
+            value.fieldName,
+            value.oldValue,
+            value.newValue,
+            value.evidenceText,
+            value.sourceUrl,
+            value.confidence,
+            timestamp,
+          ),
+      ),
+    );
+
+    const candidates = await Promise.all(
+      values.map(({ value }) =>
+        this.findByCheckAndField(value.checkId!, value.fieldName),
+      ),
+    );
+
+    if (candidates.some((candidate) => candidate === null)) {
+      throw new Error("Generated change candidates could not be loaded");
+    }
+
+    return candidates as CompanyChangeCandidate[];
   }
 
   async listByCompany(companyId: string): Promise<CompanyChangeCandidate[]> {
